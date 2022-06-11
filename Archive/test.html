@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://unpkg.com/vis-timeline@7.5.1/styles/vis-timeline-graph2d.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css">
+</head>
+<body>
+    <style>
+        .container {
+            width: 100%;
+        }
+        .video__block {
+            width: 60%;
+            height: 60%;
+            margin: 0 auto;
+        }
+        .time__line {
+            margin-top: 50px;
+            background-color: white;
+        }
+        textarea {
+            width: 300px;
+            height: 300px;
+        }
+    </style>
+    <div class="container">
+        <div class="video__block">
+            <video id="test" width="100%" height="100%" controls>
+                <source src="3.mp4" type="video/mp4">
+            </video>
+        </div>
+          
+          <!-- <p>Playback position: <span id="demo"></span></p> -->
+        
+        <div class="time__line" id="mytimeline">
+            <div class="timeline-menu">
+              <button type="button" id="zoomIn" class="fa fa-plus"/></button>
+              <button type="button" id="zoomOut" class="fa fa-minus"/></button>
+              <button type="button" id="moveLeft" class="fa fa-angle-double-left"/></button>
+              <button type="button" id="moveRight" class="fa fa-angle-double-right"/></button>
+            </div>
+          </div>
+    </div>
+    
+    <form action="">    
+        <textarea style="display: none;" id="data"></textarea>
+        
+        <select name="" id="">
+            <option value="">MP4</option>
+            <option value="">MKV</option>
+            <option value="">MPEG</option>
+            <option value="">TS</option>
+        </select>
+        
+        <button type="submit" id="save">YADDA SAXLA</button>
+    </form>
+    
+</body>
+
+<script src="https://unpkg.com/vis-timeline@7.5.1/standalone/umd/vis-timeline-graph2d.min.js"></script>
+<script>
+    
+    var vid = document.getElementById("test");
+    console.log("Video: ", vid);
+    var time = vid.duration;
+    let testdate;
+    var count = 0;
+
+    
+    while (time > 60) {
+        time /= 60;
+        count++;
+        console.log(time)
+    }
+    
+    minute = Math.floor(time);
+    second = vid.duration - (minute * 60);
+    
+    vid.ontimeupdate = function() {myFunction()};
+
+    function myFunction() {
+        // document.getElementById("demo").innerHTML = vid.currentTime;
+        let asd = vid.currentTime;
+        console.log("Saniye: ", vid.currentTime);
+       // console.log("Type: ", typeof vid.currentTime )
+        hours = 0;
+        minute1 = asd/60;
+        minute = Math.floor(minute1);
+        second = asd%60;
+       
+
+        timeline.setCustomTime(new Date(1971, 1, 1, 00, minute, second, 000));
+        
+        // customDate = new Date(1970, 0, 0, 00, 0, 0, 000);
+        // timeline.addCustomTime(customDate, "t2");
+        
+        eben = timeline.on("timechange", function (properties) {
+            eben = properties.time;
+            eben = eben.toString();
+            eben = eben.slice(16,24);
+            eben = eben.split(':');
+            Hour = eben[0];
+            Minute = eben[1];
+            Second = eben[2];
+            newHour = parseInt(Hour);
+            newMinute = parseInt(Minute);
+            nwSecond = parseInt(Second);
+            newSecond = nwSecond + (newMinute * 60) + (newHour * 360);
+            console.log(newSecond);
+            vid.currentTime = newSecond;
+        });
+    }
+    
+    var txtData = document.getElementById("data");
+    var txtData = document.getElementById("data");
+    var btnSave = document.getElementById("save");
+    
+    function saveData() {
+    // get the data from the DataSet
+    //
+    // Note that we specify the output type of the fields start and end
+    // as "ISODate", which is safely serializable. Other serializable types
+    // are "Number" (unix timestamp), "ASPDate" or "String" (without timezone!).
+    //
+    // Alternatively, it is possible to configure the DataSet to convert
+    // the output automatically to ISODates like:
+    //
+    //   var options = {
+    //     type: {start: 'ISODate', end: 'ISODate'}
+    //   };
+    //   var items = new vis.DataSet(options);
+    //   // now items.get() will automatically convert start and end to ISO dates.
+    //
+    var data = timeline_items.get({
+        type: {
+        start: "ISODate",
+        },
+    });
+    var data2 = timeline_items.get({
+        type: {
+        end: "ISODate",
+        },
+    });
+    console.log('-> ', data);
+    // serialize the data and put it in the textarea
+    txtData.value = JSON.stringify(data, null, 1);
+    }
+    btnSave.onclick = saveData;
+    
+    
+    
+    var timeline_items = new vis.DataSet();
+var timeline_groups = new vis.DataSet();
+
+var start = new Date(1971, 1, 1, 00, 0, 0, 0);
+var end = new Date(1971, 1, 1, 00, minute, second, 0);
+
+// specify options
+var options = {
+    width:  "100%",
+    height: "200px",
+
+    align: "box",
+    groupHeightMode:'fixed',
+    maxMinorChars : 2,
+
+    zoomKey: "ctrlKey",
+    horizontalScroll: true,
+    verticalScroll: true,
+    orientation: "top",
+    moveable: true,
+    zoomable : true,
+    editable: true,
+    selectable: true,
+    min: start,
+    max: end,
+    start: start,
+    end: end,
+    zoomMax: 10000000,
+    zoomMin: 1000,
+
+    stack:false,
+    multiselect: true,
+    multiselectPerGroup: true,
+
+    editable: {
+        add: false,         // add new items by double tapping
+        updateTime: true,  // drag items horizontally
+        updateGroup: true, // drag items from one group to another
+        remove: false,       // delete an item by tapping the delete button top right
+        overrideItems: true  // allow these options to override item.editable
+    },
+
+    onRemove: function(item, callback) {
+        callback(item);
+    },
+
+    onMove: function(item, callback) {
+        callback(item);
+    },
+    onMoving: function(item, callback) {
+        let currentItem = timeline_items.get(item.id);
+        if (item.start < limit_min) item.start = limit_min;
+        callback(item);
+    },
+
+    rollingMode: {
+        follow: false,
+        offset: 0.5
+    },
+
+    format: {
+      minorLabels: {
+        millisecond:'SSS',
+        second:     's',
+        minute:     'HH:mm:ss',
+        hour:       'HH:mm:ss',
+        weekday:    'HH:mm:ss',
+        day:        'HH:mm:ss',
+        week:       'HH:mm:ss',
+        month:      'HH:mm:ss',
+        year:       'HH:mm:ss'
+      },
+      majorLabels: {
+        millisecond:'HH:mm:ss',
+        second:     'HH:mm:ss',
+        minute:     '',
+        hour:       '',
+        weekday:    '',
+        day:        '',
+        week:       '',
+        month:      '',
+        year:       ''
+      }
+    },
+};
+
+var limit_min = new Date(1971, 1, 1, 00, 0, 0,  000);
+
+var timeline_items = new vis.DataSet([
+  { 
+    id: 1, 
+    start: 4, end: end,
+    content: "video 1"
+  }
+]);
+
+var timeline_groups = new vis.DataSet();
+
+// Set callback to run when API is loaded
+timeline = new vis.Timeline(document.getElementById('mytimeline'), timeline_items, timeline_groups, options);
+
+timeline.addCustomTime(new Date("1971, 01, 01, 00, 00, 00, 000"));
+
+timeline.setCustomTimeTitle('00:00:00,000');
+
+timeline.setOptions(options);
+
+timeline.setGroups(null);
+
+function move (percentage) {
+  var range = timeline.getWindow();
+  var interval = range.end - range.start;
+
+  timeline.setWindow({
+      start: range.start.valueOf() - interval * percentage,
+      end:   range.end.valueOf()   - interval * percentage
+  });
+  }
+
+document.getElementById('zoomIn').onclick    = function () { timeline.zoomIn( 0.5); };
+document.getElementById('zoomOut').onclick   = function () { timeline.zoomOut( 0.5); };
+document.getElementById('moveLeft').onclick  = function () { move( 0.5); };
+document.getElementById('moveRight').onclick = function () { move(-0.5); };
+
+
+</script>
+</html>

@@ -1,0 +1,11 @@
+ffmpeg \
+-i input.mp4 \
+-vcodec copy \
+-acodec copy \
+output.mkv
+
+Mp4 to mkv
+
+
+Convert low size
+ffmpeg % ffmpeg -i output2.mp4 -s hd1080 -c:v libx264 -crf 23 -c:a aac -strict -2 output4.mp4
